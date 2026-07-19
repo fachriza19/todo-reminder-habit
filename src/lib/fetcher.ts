@@ -11,6 +11,21 @@ export class ApiClientError extends Error {
 }
 
 /**
+ * A session can die mid-visit (expiry, revocation, rotated secret). When that
+ * happens several in-flight queries tend to 401 at once, so latch on the first
+ * one — otherwise each would kick off its own navigation.
+ */
+let signingOut = false;
+
+function bailToLogin() {
+  if (typeof window === "undefined" || signingOut) return;
+  signingOut = true;
+  // Full page load, not router.push: the route handler must clear the cookie
+  // before /login renders, and the whole client cache is stale anyway.
+  window.location.href = "/api/session/expired";
+}
+
+/**
  * Fetch a `{ data, error }` endpoint and unwrap it. Throws ApiClientError on
  * failure so TanStack Query can surface it to error states / rollback.
  */
@@ -40,10 +55,11 @@ export async function apiFetch<T>(
 
   if (!res.ok || body.error) {
     const err = body.error;
-    throw new ApiClientError(
-      err?.code ?? "INTERNAL",
-      err?.message ?? "Something went wrong.",
-    );
+    const code = err?.code ?? "INTERNAL";
+    // The session is gone. Sign out for real instead of rendering "you need to
+    // sign in" inside a page the user can no longer use.
+    if (code === "UNAUTHORIZED") bailToLogin();
+    throw new ApiClientError(code, err?.message ?? "Something went wrong.");
   }
 
   return body.data as T;

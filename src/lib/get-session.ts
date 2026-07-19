@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { headers } from "next/headers";
 import { auth } from "./auth";
 import { AppError } from "./api";
@@ -5,10 +6,14 @@ import { AppError } from "./api";
 /**
  * Read the current Better Auth session on the server. Returns null if none.
  * Use in Server Components / layouts where "not signed in" is a valid branch.
+ *
+ * Wrapped in `cache()` so the layout, the page, and any route handler in the
+ * same request share one lookup. Turso is remote — each duplicate call is a
+ * real network round-trip.
  */
-export async function getSession() {
+export const getSession = cache(async () => {
   return auth.api.getSession({ headers: await headers() });
-}
+});
 
 /**
  * Require an authenticated user in a route handler / server action.

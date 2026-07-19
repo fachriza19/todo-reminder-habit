@@ -7,10 +7,13 @@ export default async function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Authoritative auth gate (middleware is only an optimistic edge check).
+  // Authoritative auth gate (proxy.ts is only an optimistic cookie check).
   const session = await getSession();
   if (!session?.user) {
-    redirect("/login");
+    // Go through the route handler rather than straight to /login: the stale
+    // cookie is still set, so proxy.ts would bounce /login back here forever.
+    // Only a Route Handler can delete it.
+    redirect("/api/session/expired");
   }
 
   const user = {

@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# Netlify's official Next.js runtime. Turns App Router route handlers into
+# serverless functions and handles caching/ISR. Auto-installed when Next is
+# detected, but pinned here explicitly.
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

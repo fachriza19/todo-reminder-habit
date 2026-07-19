@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
+import { ApiClientError } from "@/lib/fetcher";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -17,7 +18,12 @@ export function Providers({ children }: { children: React.ReactNode }) {
         defaultOptions: {
           queries: {
             staleTime: 30_000,
-            retry: 1,
+            // A 401 will never succeed on retry — it just costs another
+            // round-trip and delays the redirect to /login.
+            retry: (failureCount, error) =>
+              error instanceof ApiClientError && error.code === "UNAUTHORIZED"
+                ? false
+                : failureCount < 1,
             refetchOnWindowFocus: false,
           },
         },
