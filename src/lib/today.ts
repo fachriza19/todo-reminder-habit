@@ -1,5 +1,5 @@
-import { format } from "date-fns";
 import type { Todo } from "@/db/schema";
+import { getLocalToday } from "@/lib/utils";
 import type { HabitWithProgress } from "@/server/services/habit.service";
 
 /**
@@ -22,8 +22,9 @@ export type SplitHabits = {
   complete: HabitWithProgress[];
 };
 
+/** Local calendar date of an epoch timestamp, via the canonical "today" source. */
 function localDate(ms: number): string {
-  return format(new Date(ms), "yyyy-MM-dd");
+  return getLocalToday(new Date(ms));
 }
 
 /** Highest priority first, then the user's manual order, then oldest first. */
