@@ -14,7 +14,7 @@ export function GoogleButton({ label = "Continue with Google" }: { label?: strin
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/todos",
+        callbackURL: "/today",
       });
       // On success the browser is redirected by Better Auth.
     } catch {

@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 const AUTH_ROUTES = ["/login", "/signup"];
-const APP_ROUTES = ["/todos", "/reminders", "/habits", "/settings"];
+const APP_ROUTES = ["/today", "/todos", "/reminders", "/habits", "/settings"];
 
 /**
  * Optimistic route protection (F-AUTH-5). Presence of the session cookie is
@@ -25,13 +25,13 @@ export function proxy(request: NextRequest) {
 
   // Signed in, hitting login/signup -> go to the app.
   if (isAuthRoute && hasSession) {
-    return NextResponse.redirect(new URL("/todos", request.url));
+    return NextResponse.redirect(new URL("/today", request.url));
   }
 
   // Root: route to app or login depending on session.
   if (pathname === "/") {
     return NextResponse.redirect(
-      new URL(hasSession ? "/todos" : "/login", request.url),
+      new URL(hasSession ? "/today" : "/login", request.url),
     );
   }
 
@@ -43,6 +43,7 @@ export const config = {
     "/",
     "/login",
     "/signup",
+    "/today/:path*",
     "/todos/:path*",
     "/reminders/:path*",
     "/habits/:path*",

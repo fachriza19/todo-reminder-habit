@@ -3,5 +3,5 @@ import { getSession } from "@/lib/get-session";
 
 export default async function RootPage() {
   const session = await getSession();
-  redirect(session?.user ? "/todos" : "/login");
+  redirect(session?.user ? "/today" : "/login");
 }
