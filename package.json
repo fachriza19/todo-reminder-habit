@@ -9,6 +9,8 @@
     "start": "next start -p 3100",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "db:generate": "dotenv -e .env -- drizzle-kit generate",
     "db:migrate": "dotenv -e .env -- drizzle-kit migrate",
     "db:push": "dotenv -e .env -- drizzle-kit push",
@@ -42,6 +44,7 @@
     "eslint-config-next": "16.2.10",
     "shadcn": "^4.13.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }
