@@ -20,7 +20,7 @@ export function TodaySection({
 }) {
   return (
     <section className="grid gap-3">
-      <div className="flex items-baseline justify-between gap-2">
+      <div className="flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold tracking-tight">
           {title}
           {count !== undefined && count > 0 ? (
@@ -31,7 +31,7 @@ export function TodaySection({
         </h2>
         <Link
           href={href}
-          className="text-muted-foreground hover:text-foreground inline-flex shrink-0 items-center gap-1 text-xs font-medium"
+          className="text-muted-foreground hover:text-foreground inline-flex min-h-11 shrink-0 items-center gap-1 text-xs font-medium"
         >
           {linkLabel}
           <ArrowRight className="size-3" />
