@@ -1,6 +1,6 @@
 import { handle, ok, readJson, validate } from "@/lib/api";
 import { requireUserId } from "@/lib/get-session";
-import { updateHabitSchema } from "@/lib/validations/habit";
+import { todayQuerySchema, updateHabitSchema } from "@/lib/validations/habit";
 import {
   deleteHabit,
   getHabit,
@@ -9,11 +9,17 @@ import {
 
 type Ctx = { params: Promise<{ id: string }> };
 
-export function GET(_req: Request, { params }: Ctx) {
+export function GET(req: Request, { params }: Ctx) {
   return handle(async () => {
     const userId = await requireUserId();
     const { id } = await params;
-    const data = await getHabit(userId, id);
+    // See the habits list route: "today" belongs to the client, not the server.
+    const today = new URL(req.url).searchParams.get("today");
+    const data = await getHabit(
+      userId,
+      id,
+      today === null ? undefined : validate(todayQuerySchema, today),
+    );
     return ok(data);
   });
 }

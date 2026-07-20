@@ -16,10 +16,17 @@ export type HabitWithProgress = Habit & {
 
 /**
  * List non-archived habits with today's count + current streak. Scoped to
- * userId. Streak uses getLocalToday() — the single "today" source (PRD 5A.5).
+ * userId.
+ *
+ * `today` is the CALLER's local date, not the server's. Habit logs are written
+ * with the browser's local date, so computing it here with getLocalToday()
+ * would read a different row whenever the server's timezone puts it on another
+ * calendar day (UTC server, UTC+7 user: wrong for seven hours a day). Falls
+ * back to the server date only for callers that have no user context.
  */
 export async function listHabits(
   userId: string,
+  today: string = getLocalToday(),
 ): Promise<HabitWithProgress[]> {
   const rows = await db
     .select()
@@ -34,7 +41,6 @@ export async function listHabits(
     .from(habitLogs)
     .where(eq(habitLogs.userId, userId));
 
-  const today = getLocalToday();
   const logsByHabit = new Map<string, HabitLog[]>();
   for (const log of logs) {
     const list = logsByHabit.get(log.habitId) ?? [];
@@ -186,10 +192,14 @@ export async function getHabitHistory(
     .orderBy(asc(habitLogs.date));
 }
 
-/** Single habit with progress (for the detail page). Scoped to userId. */
+/**
+ * Single habit with progress (for the detail page). Scoped to userId.
+ * `today` is the caller's local date — see listHabits for why.
+ */
 export async function getHabit(
   userId: string,
   id: string,
+  today: string = getLocalToday(),
 ): Promise<HabitWithProgress> {
   const rows = await db
     .select()
@@ -204,7 +214,6 @@ export async function getHabit(
     .from(habitLogs)
     .where(and(eq(habitLogs.userId, userId), eq(habitLogs.habitId, id)));
 
-  const today = getLocalToday();
   const todayCount = hlogs.find((l) => l.date === today)?.count ?? 0;
   const completeDates = new Set(
     hlogs.filter((l) => l.count >= habit.targetCount).map((l) => l.date),
