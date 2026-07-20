@@ -1,6 +1,6 @@
 import { and, eq, asc, isNull, max, inArray } from "drizzle-orm";
 import { db } from "@/db/client";
-import { todos, type Todo } from "@/db/schema";
+import { categories, todos, type Todo } from "@/db/schema";
 import { AppError } from "@/lib/api";
 import { epochNow, newId } from "@/lib/utils";
 import type {
@@ -42,10 +42,31 @@ export async function listTodos(
     .orderBy(asc(todos.isDone), asc(todos.sortOrder), asc(todos.createdAt));
 }
 
+/**
+ * Guard: a categoryId supplied by the client must belong to the same user
+ * (F-AUTH-6). The FK only proves the category exists — without this check a
+ * request could attach todos to another user's category.
+ */
+async function assertCategoryOwned(
+  userId: string,
+  categoryId: string,
+): Promise<void> {
+  const owned = await db
+    .select({ id: categories.id })
+    .from(categories)
+    .where(and(eq(categories.id, categoryId), eq(categories.userId, userId)));
+
+  if (owned.length === 0) {
+    throw new AppError("NOT_FOUND", "That category no longer exists.");
+  }
+}
+
 export async function createTodo(
   userId: string,
   input: CreateTodoInput,
 ): Promise<Todo> {
+  if (input.categoryId) await assertCategoryOwned(userId, input.categoryId);
+
   const [{ value: maxOrder } = { value: null }] = await db
     .select({ value: max(todos.sortOrder) })
     .from(todos)
@@ -73,6 +94,8 @@ export async function updateTodo(
   id: string,
   input: UpdateTodoInput,
 ): Promise<Todo> {
+  if (input.categoryId) await assertCategoryOwned(userId, input.categoryId);
+
   const patch: Partial<Todo> = {};
   if (input.title !== undefined) patch.title = input.title;
   if (input.notes !== undefined) patch.notes = input.notes ?? null;
