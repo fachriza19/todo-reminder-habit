@@ -42,7 +42,7 @@ export function SignupForm() {
       toast.error(error.message ?? "Couldn't create your account.");
       return;
     }
-    router.push("/todos");
+    router.push("/today");
     router.refresh();
   }
 

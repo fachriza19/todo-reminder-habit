@@ -41,7 +41,7 @@ export function LoginForm() {
       toast.error(error.message ?? "Couldn't sign you in. Check your details.");
       return;
     }
-    router.push("/todos");
+    router.push("/today");
     router.refresh();
   }
 

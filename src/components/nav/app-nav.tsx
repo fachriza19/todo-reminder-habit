@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CheckSquare, Bell, Flame, Settings, LogOut } from "lucide-react";
+import { CalendarDays, CheckSquare, Bell, Flame, Settings, LogOut } from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ import { DueBadge } from "@/components/reminder/due-badge";
 type NavUser = { name: string; email: string; image: string | null };
 
 const NAV_ITEMS = [
+  { href: "/today", label: "Today", icon: CalendarDays },
   { href: "/todos", label: "Todos", icon: CheckSquare },
   { href: "/reminders", label: "Reminders", icon: Bell },
   { href: "/habits", label: "Habits", icon: Flame },
@@ -102,7 +103,7 @@ export function MobileTabBar() {
   const items = [...NAV_ITEMS, { href: "/settings", label: "Settings", icon: Settings }] as const;
 
   return (
-    <nav className="bg-background/95 supports-backdrop-filter:bg-background/80 fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden">
+    <nav className="bg-background/95 supports-backdrop-filter:bg-background/80 fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden">
       {items.map((item) => {
         const active = isActive(pathname, item.href);
         return (
@@ -111,7 +112,7 @@ export function MobileTabBar() {
             href={item.href}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-14 flex-col items-center justify-center gap-1 text-xs font-medium",
+              "flex min-h-14 flex-col items-center justify-center gap-1 px-0.5 text-xs font-medium",
               active ? "text-primary" : "text-muted-foreground",
             )}
           >
@@ -121,7 +122,7 @@ export function MobileTabBar() {
                 <DueBadge className="absolute -top-1.5 -right-2.5" />
               ) : null}
             </span>
-            {item.label}
+            <span className="max-w-full truncate">{item.label}</span>
           </Link>
         );
       })}
