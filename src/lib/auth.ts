@@ -28,6 +28,15 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
+  session: {
+    // Cache session data in a signed cookie so getSession() skips the Turso
+    // round-trip on most requests. Trade-off: a revoked session stays usable
+    // for up to maxAge seconds on cached reads.
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
