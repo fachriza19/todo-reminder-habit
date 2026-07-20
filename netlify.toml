@@ -5,6 +5,11 @@
 [build.environment]
   NODE_VERSION = "22"
   NEXT_TELEMETRY_DISABLED = "1"
+  # BETTER_AUTH_URL is the app's public URL, not a credential. Netlify's
+  # secrets scanner flags it because the env var is marked secret in the UI
+  # and its value (a URL) also appears in docs and build output. Real secrets
+  # (BETTER_AUTH_SECRET, TURSO_AUTH_TOKEN, GOOGLE_CLIENT_SECRET) stay scanned.
+  SECRETS_SCAN_OMIT_KEYS = "BETTER_AUTH_URL"
 
 # Netlify's official Next.js runtime. Turns App Router route handlers into
 # serverless functions and handles caching/ISR. Auto-installed when Next is
