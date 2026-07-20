@@ -7,6 +7,7 @@ import {
 } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/fetcher";
 import { epochNow, newId, getLocalToday } from "@/lib/utils";
+import { useLocalToday } from "@/hooks/use-local-today";
 import type { HabitWithProgress } from "@/server/services/habit.service";
 import type { Habit, HabitLog } from "@/db/schema";
 import type {
@@ -14,12 +15,33 @@ import type {
   UpdateHabitInput,
 } from "@/lib/validations/habit";
 
+/**
+ * Prefix key. Every habits query hangs off it, so invalidating KEY still
+ * reaches the dated list and the archived list alike. NOT a cache address —
+ * getQueryData/setQueryData match exactly, so those need the full dated key
+ * from useHabitsKey().
+ */
 const KEY = ["habits"] as const;
 
+/**
+ * The cache address for the habits list: prefix + the browser's local date.
+ *
+ * The date is part of the key because habit progress is relative to the user's
+ * local day. Keying by it means a page left open past midnight refetches
+ * instead of serving yesterday's todayCount — which matters because the +1
+ * control submits an absolute count derived from that value.
+ */
+function useHabitsKey() {
+  const today = useLocalToday();
+  return [...KEY, today] as const;
+}
+
 export function useHabits() {
+  const today = useLocalToday();
   return useQuery({
-    queryKey: KEY,
-    queryFn: () => apiFetch<HabitWithProgress[]>("/api/habits"),
+    queryKey: [...KEY, today],
+    queryFn: () =>
+      apiFetch<HabitWithProgress[]>(`/api/habits?today=${today}`),
   });
 }
 
@@ -33,9 +55,11 @@ export function useArchivedHabits() {
 }
 
 export function useHabit(id: string) {
+  const today = useLocalToday();
   return useQuery({
-    queryKey: ["habit", id],
-    queryFn: () => apiFetch<HabitWithProgress>(`/api/habits/${id}`),
+    queryKey: ["habit", id, today],
+    queryFn: () =>
+      apiFetch<HabitWithProgress>(`/api/habits/${id}?today=${today}`),
   });
 }
 
@@ -51,6 +75,7 @@ export function useHabitHistory(habitId: string, from: string, to: string) {
 
 export function useCreateHabit() {
   const qc = useQueryClient();
+  const key = useHabitsKey();
   return useMutation({
     mutationFn: (input: CreateHabitInput) =>
       apiFetch<HabitWithProgress>("/api/habits", {
@@ -59,7 +84,7 @@ export function useCreateHabit() {
       }),
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: KEY });
-      const prev = qc.getQueryData<HabitWithProgress[]>(KEY) ?? [];
+      const prev = qc.getQueryData<HabitWithProgress[]>(key) ?? [];
       const optimistic: HabitWithProgress = {
         id: newId(),
         userId: "",
@@ -73,11 +98,11 @@ export function useCreateHabit() {
         todayCount: 0,
         streak: 0,
       };
-      qc.setQueryData<HabitWithProgress[]>(KEY, [...prev, optimistic]);
+      qc.setQueryData<HabitWithProgress[]>(key, [...prev, optimistic]);
       return { prev };
     },
     onError: (_e, _v, ctx) => {
-      if (ctx?.prev) qc.setQueryData(KEY, ctx.prev);
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev);
     },
     onSettled: () => qc.invalidateQueries({ queryKey: KEY }),
   });
@@ -85,6 +110,7 @@ export function useCreateHabit() {
 
 export function useUpdateHabit() {
   const qc = useQueryClient();
+  const key = useHabitsKey();
   return useMutation({
     mutationFn: ({ id, patch }: { id: string; patch: UpdateHabitInput }) =>
       apiFetch<Habit>(`/api/habits/${id}`, {
@@ -93,7 +119,7 @@ export function useUpdateHabit() {
       }),
     onMutate: async ({ id, patch }) => {
       await qc.cancelQueries({ queryKey: KEY });
-      const prev = qc.getQueryData<HabitWithProgress[]>(KEY) ?? [];
+      const prev = qc.getQueryData<HabitWithProgress[]>(key) ?? [];
       // Archived habits drop out of the active list; strip isArchived (boolean)
       // from the field merge since the stored column is numeric.
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -111,11 +137,11 @@ export function useUpdateHabit() {
                   }
                 : h,
             );
-      qc.setQueryData<HabitWithProgress[]>(KEY, next);
+      qc.setQueryData<HabitWithProgress[]>(key, next);
       return { prev };
     },
     onError: (_e, _v, ctx) => {
-      if (ctx?.prev) qc.setQueryData(KEY, ctx.prev);
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev);
     },
     onSettled: () => {
       qc.invalidateQueries({ queryKey: KEY });
@@ -126,14 +152,15 @@ export function useUpdateHabit() {
 
 export function useDeleteHabit() {
   const qc = useQueryClient();
+  const key = useHabitsKey();
   return useMutation({
     mutationFn: (id: string) =>
       apiFetch<{ id: string }>(`/api/habits/${id}`, { method: "DELETE" }),
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: KEY });
-      const prev = qc.getQueryData<HabitWithProgress[]>(KEY) ?? [];
+      const prev = qc.getQueryData<HabitWithProgress[]>(key) ?? [];
       qc.setQueryData<HabitWithProgress[]>(
-        KEY,
+        key,
         prev.filter((h) => h.id !== id),
       );
       const prevArchived = qc.getQueryData<Habit[]>(ARCHIVED_KEY) ?? [];
@@ -144,7 +171,7 @@ export function useDeleteHabit() {
       return { prev, prevArchived };
     },
     onError: (_e, _v, ctx) => {
-      if (ctx?.prev) qc.setQueryData(KEY, ctx.prev);
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev);
       if (ctx?.prevArchived) qc.setQueryData(ARCHIVED_KEY, ctx.prevArchived);
     },
     onSettled: () => {
@@ -161,7 +188,13 @@ export function useDeleteHabit() {
  */
 export function useLogHabit() {
   const qc = useQueryClient();
+  const key = useHabitsKey();
   return useMutation({
+    // The write date is read fresh at submit time rather than taken from the
+    // render-time key: a click just after midnight must land on the new day.
+    // For up to one tick the key can still point at the previous day, which
+    // only stales the optimistic paint — onSettled invalidates the prefix, so
+    // both days refetch.
     mutationFn: ({ habitId, count }: { habitId: string; count: number }) =>
       apiFetch<HabitLog>(`/api/habits/${habitId}/log`, {
         method: "POST",
@@ -169,9 +202,9 @@ export function useLogHabit() {
       }),
     onMutate: async ({ habitId, count }) => {
       await qc.cancelQueries({ queryKey: KEY });
-      const prev = qc.getQueryData<HabitWithProgress[]>(KEY) ?? [];
+      const prev = qc.getQueryData<HabitWithProgress[]>(key) ?? [];
       qc.setQueryData<HabitWithProgress[]>(
-        KEY,
+        key,
         prev.map((h) => {
           if (h.id !== habitId) return h;
           const wasComplete = h.todayCount >= h.targetCount;
@@ -185,7 +218,7 @@ export function useLogHabit() {
       return { prev };
     },
     onError: (_e, _v, ctx) => {
-      if (ctx?.prev) qc.setQueryData(KEY, ctx.prev);
+      if (ctx?.prev) qc.setQueryData(key, ctx.prev);
     },
     onSettled: (_d, _e, { habitId }) => {
       qc.invalidateQueries({ queryKey: KEY });

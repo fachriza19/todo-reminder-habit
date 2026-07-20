@@ -37,6 +37,12 @@ export const habitHistoryQuerySchema = z.object({
   to: dateString,
 });
 
+/**
+ * The caller's local calendar date. "Today" is a per-user, timezone-dependent
+ * concept, so the client sends it; the server cannot derive it (F-HAB-3).
+ */
+export const todayQuerySchema = dateString;
+
 export type CreateHabitInput = z.infer<typeof createHabitSchema>;
 export type UpdateHabitInput = z.infer<typeof updateHabitSchema>;
 export type LogHabitInput = z.infer<typeof logHabitSchema>;

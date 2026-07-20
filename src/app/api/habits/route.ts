@@ -1,6 +1,6 @@
 import { handle, ok, readJson, validate } from "@/lib/api";
 import { requireUserId } from "@/lib/get-session";
-import { createHabitSchema } from "@/lib/validations/habit";
+import { createHabitSchema, todayQuerySchema } from "@/lib/validations/habit";
 import {
   createHabit,
   listHabits,
@@ -14,7 +14,15 @@ export function GET(req: Request) {
     if (searchParams.get("archived") === "1") {
       return ok(await listArchivedHabits(userId));
     }
-    return ok(await listHabits(userId));
+    // The client's local date drives "today" — the server's timezone is not
+    // the user's. Omitted only by callers with no browser context.
+    const today = searchParams.get("today");
+    return ok(
+      await listHabits(
+        userId,
+        today === null ? undefined : validate(todayQuerySchema, today),
+      ),
+    );
   });
 }
 
