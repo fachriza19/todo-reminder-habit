@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { Reminder } from "@/db/schema";
 import { useUpdateReminder } from "@/hooks/use-reminders";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 function formatRemindAt(ms: number): string {
   const d = new Date(ms);
@@ -36,7 +37,7 @@ function ReminderRow({
         className="size-6"
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm">{reminder.title}</span>
+        <TruncatedText text={reminder.title} className="text-sm" />
         <span
           className={cn(
             "text-xs",

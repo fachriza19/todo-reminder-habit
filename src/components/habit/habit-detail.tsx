@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/common/error-state";
+import { TruncatedText } from "@/components/common/truncated-text";
 import { ProgressRing } from "./progress-ring";
 import { HabitCalendar } from "./habit-calendar";
 
@@ -69,9 +70,15 @@ export function HabitDetail({ id }: { id: string }) {
               </ProgressRing>
 
               <div>
-                <h1 className="text-xl font-semibold">{habit.name}</h1>
+                <h1 className="text-xl font-semibold">
+                  <TruncatedText text={habit.name} />
+                </h1>
                 {habit.unit ? (
-                  <p className="text-muted-foreground text-sm">{habit.unit}</p>
+                  <TruncatedText
+                    as="p"
+                    text={habit.unit}
+                    className="text-muted-foreground text-sm"
+                  />
                 ) : null}
               </div>
 

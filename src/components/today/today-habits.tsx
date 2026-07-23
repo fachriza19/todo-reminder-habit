@@ -11,6 +11,7 @@ import { useLogHabit } from "@/hooks/use-habits";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressRing } from "@/components/habit/progress-ring";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 export function TodayHabits({
   incomplete,
@@ -54,7 +55,11 @@ export function TodayHabits({
               </span>
             </ProgressRing>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{habit.name}</p>
+              <TruncatedText
+                as="p"
+                text={habit.name}
+                className="text-sm font-medium"
+              />
               <p className="text-muted-foreground text-xs">
                 {habit.todayCount}/{habit.targetCount}
                 {habit.unit ? ` ${habit.unit}` : ""}
@@ -104,7 +109,7 @@ export function TodayHabits({
                   className="flex items-center gap-2 px-3 text-sm"
                 >
                   <Check className="text-success size-3.5 shrink-0" />
-                  <span className="truncate">{habit.name}</span>
+                  <TruncatedText text={habit.name} />
                   <span className="text-muted-foreground ml-auto shrink-0 text-xs tabular-nums">
                     {habit.todayCount}/{habit.targetCount}
                   </span>

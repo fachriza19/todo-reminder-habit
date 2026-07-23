@@ -9,6 +9,7 @@ import type { Todo } from "@/db/schema";
 import type { TodayTodoGroups } from "@/lib/today";
 import { useUpdateTodo } from "@/hooks/use-todos";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 const PRIORITY_LABEL = ["None", "Low", "Medium", "High"];
 
@@ -56,7 +57,7 @@ function TodoRow({
         className="size-6"
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm">{todo.title}</span>
+        <TruncatedText text={todo.title} className="text-sm" />
         {meta ? (
           <span
             className={cn(
