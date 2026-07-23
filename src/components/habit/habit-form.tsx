@@ -117,7 +117,7 @@ export function HabitForm({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Drink water" {...field} />
+                    <Input maxLength={80} placeholder="Drink water" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -151,7 +151,7 @@ export function HabitForm({
                   <FormItem>
                     <FormLabel>Unit (optional)</FormLabel>
                     <FormControl>
-                      <Input placeholder="glasses" {...field} />
+                      <Input maxLength={24} placeholder="glasses" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

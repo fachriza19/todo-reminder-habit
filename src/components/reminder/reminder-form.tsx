@@ -112,7 +112,7 @@ export function ReminderForm({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Call the dentist" {...field} />
+                    <Input maxLength={200} placeholder="Call the dentist" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
