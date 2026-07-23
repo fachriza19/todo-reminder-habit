@@ -178,7 +178,7 @@ function CategoryRow({ category }: { category: Category }) {
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete “{category.name}”?</AlertDialogTitle>
+            <AlertDialogTitle className="break-words">Delete “{category.name}”?</AlertDialogTitle>
             <AlertDialogDescription>
               Its tasks stay and become uncategorized. This can’t be undone.
             </AlertDialogDescription>
