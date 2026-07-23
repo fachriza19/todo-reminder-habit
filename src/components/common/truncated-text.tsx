@@ -40,12 +40,16 @@ export function TruncatedText({
         <TooltipTrigger
           render={
             <PopoverTrigger
+              nativeButton={false}
               render={
                 <Tag
                   ref={ref}
                   title={text}
                   className={cn(textClass, "cursor-pointer text-left")}
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.stopPropagation();
