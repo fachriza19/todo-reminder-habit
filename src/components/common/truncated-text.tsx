@@ -45,6 +45,12 @@ export function TruncatedText({
                   ref={ref}
                   title={text}
                   className={cn(textClass, "cursor-pointer text-left")}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                    }
+                  }}
                 />
               }
             />
