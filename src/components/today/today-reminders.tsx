@@ -26,7 +26,7 @@ function ReminderRow({
   return (
     <li
       className={cn(
-        "bg-card animate-in fade-in-0 flex items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
+        "bg-card animate-in fade-in-0 flex min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
         due && "border-warning/40 bg-warning/5",
       )}
     >

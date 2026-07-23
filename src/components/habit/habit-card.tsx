@@ -44,7 +44,7 @@ export function HabitCard({
   const complete = habit.todayCount >= habit.targetCount;
 
   return (
-    <Card className="animate-in fade-in-0 flex flex-row items-center gap-3 p-3 duration-200 sm:gap-4 sm:p-4">
+    <Card className="animate-in fade-in-0 flex min-w-0 flex-row items-center gap-3 p-3 duration-200 sm:gap-4 sm:p-4">
       <Link
         href={`/habits/${habit.id}`}
         className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4"

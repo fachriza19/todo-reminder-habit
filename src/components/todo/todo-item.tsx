@@ -45,7 +45,7 @@ export function TodoItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group bg-card animate-in fade-in-0 flex items-center gap-2 rounded-lg border px-2 py-2 duration-200",
+        "group bg-card animate-in fade-in-0 flex min-w-0 items-center gap-2 rounded-lg border px-2 py-2 duration-200",
         isDragging && "z-10 opacity-80 shadow-md",
       )}
     >

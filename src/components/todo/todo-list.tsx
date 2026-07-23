@@ -69,7 +69,7 @@ export function TodoList({
         items={todos.map((t) => t.id)}
         strategy={verticalListSortingStrategy}
       >
-        <ul className="grid gap-2">
+        <ul className="grid min-w-0 gap-2">
           {todos.map((todo) => (
             <TodoItem
               key={todo.id}

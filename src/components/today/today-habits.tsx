@@ -36,7 +36,7 @@ export function TodayHabits({
         <Card
           key={habit.id}
           size="sm"
-          className="animate-in fade-in-0 flex flex-row items-center gap-3 p-3 duration-200"
+          className="animate-in fade-in-0 flex min-w-0 flex-row items-center gap-3 p-3 duration-200"
         >
           <Link
             href={`/habits/${habit.id}`}
@@ -106,10 +106,10 @@ export function TodayHabits({
               {complete.map((habit) => (
                 <li
                   key={habit.id}
-                  className="flex items-center gap-2 px-3 text-sm"
+                  className="flex min-w-0 items-center gap-2 px-3 text-sm"
                 >
                   <Check className="text-success size-3.5 shrink-0" />
-                  <TruncatedText text={habit.name} />
+                  <TruncatedText text={habit.name} className="min-w-0 flex-1" />
                   <span className="text-muted-foreground ml-auto shrink-0 text-xs tabular-nums">
                     {habit.todayCount}/{habit.targetCount}
                   </span>
