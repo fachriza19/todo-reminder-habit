@@ -109,7 +109,7 @@ export function TodoForm({
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="What needs doing?" {...field} />
+                    <Input maxLength={200} placeholder="What needs doing?" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -122,7 +122,7 @@ export function TodoForm({
                 <FormItem>
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
-                    <Textarea rows={3} placeholder="Optional details" {...field} />
+                    <Textarea maxLength={2000} rows={3} placeholder="Optional details" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

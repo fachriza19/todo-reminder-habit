@@ -10,6 +10,7 @@ import { useLogHabit } from "@/hooks/use-habits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { TruncatedText } from "@/components/common/truncated-text";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,7 +44,7 @@ export function HabitCard({
   const complete = habit.todayCount >= habit.targetCount;
 
   return (
-    <Card className="animate-in fade-in-0 flex flex-row items-center gap-3 p-3 duration-200 sm:gap-4 sm:p-4">
+    <Card className="animate-in fade-in-0 flex min-w-0 flex-row items-center gap-3 p-3 duration-200 sm:gap-4 sm:p-4">
       <Link
         href={`/habits/${habit.id}`}
         className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4"
@@ -59,7 +60,7 @@ export function HabitCard({
           </span>
         </ProgressRing>
         <div className="min-w-0">
-          <p className="truncate font-medium">{habit.name}</p>
+          <TruncatedText as="p" text={habit.name} className="font-medium" />
           <p className="text-muted-foreground text-sm">
             {habit.todayCount}/{habit.targetCount}
             {habit.unit ? ` ${habit.unit}` : ""}

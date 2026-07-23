@@ -40,6 +40,7 @@ export function AddTodo() {
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Add a task…"
         aria-label="Add a task"
+        maxLength={200}
         className="h-11"
         autoComplete="off"
       />

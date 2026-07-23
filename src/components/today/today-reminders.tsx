@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import type { Reminder } from "@/db/schema";
 import { useUpdateReminder } from "@/hooks/use-reminders";
 import { Checkbox } from "@/components/ui/checkbox";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 function formatRemindAt(ms: number): string {
   const d = new Date(ms);
@@ -25,7 +26,7 @@ function ReminderRow({
   return (
     <li
       className={cn(
-        "bg-card animate-in fade-in-0 flex items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
+        "bg-card animate-in fade-in-0 flex min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
         due && "border-warning/40 bg-warning/5",
       )}
     >
@@ -36,7 +37,7 @@ function ReminderRow({
         className="size-6"
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-sm">{reminder.title}</span>
+        <TruncatedText text={reminder.title} className="text-sm" />
         <span
           className={cn(
             "text-xs",

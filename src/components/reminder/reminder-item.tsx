@@ -8,6 +8,7 @@ import type { Reminder } from "@/db/schema";
 import { isDue } from "@/lib/reminders";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 function formatRemindAt(ms: number): string {
   const d = new Date(ms);
@@ -33,7 +34,7 @@ export function ReminderItem({
   return (
     <li
       className={cn(
-        "group bg-card animate-in fade-in-0 flex items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
+        "group bg-card animate-in fade-in-0 flex min-w-0 items-center gap-3 rounded-lg border px-3 py-2.5 duration-200",
         due && "border-warning/40 bg-warning/5",
       )}
     >
@@ -49,14 +50,13 @@ export function ReminderItem({
         onClick={() => onEdit(reminder)}
         className="flex min-w-0 flex-1 flex-col items-start py-0.5 text-left"
       >
-        <span
+        <TruncatedText
+          text={reminder.title}
           className={cn(
-            "truncate text-sm",
+            "text-sm",
             done && "text-muted-foreground line-through",
           )}
-        >
-          {reminder.title}
-        </span>
+        />
         <span
           className={cn(
             "text-xs",

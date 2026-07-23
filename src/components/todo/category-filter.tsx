@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import type { Category } from "@/db/schema";
 import { Button } from "@/components/ui/button";
 import { CategoryManager } from "./category-manager";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 function Chip({
   active,
@@ -63,7 +64,7 @@ export function CategoryFilter({
               style={{ backgroundColor: c.color ?? "var(--muted-foreground)" }}
               aria-hidden
             />
-            {c.name}
+            <TruncatedText text={c.name} className="max-w-32" />
           </Chip>
         ))}
       </div>

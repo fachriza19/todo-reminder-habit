@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { Todo, Category } from "@/db/schema";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 const PRIORITY_LABEL = ["None", "Low", "Medium", "High"];
 
@@ -44,7 +45,7 @@ export function TodoItem({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group bg-card animate-in fade-in-0 flex items-center gap-2 rounded-lg border px-2 py-2 duration-200",
+        "group bg-card animate-in fade-in-0 flex min-w-0 items-center gap-2 rounded-lg border px-2 py-2 duration-200",
         isDragging && "z-10 opacity-80 shadow-md",
       )}
     >
@@ -70,14 +71,13 @@ export function TodoItem({
         onClick={() => onEdit(todo)}
         className="flex min-w-0 flex-1 items-center gap-2 py-1 text-left"
       >
-        <span
+        <TruncatedText
+          text={todo.title}
           className={cn(
-            "truncate text-sm",
+            "text-sm",
             done && "text-muted-foreground line-through",
           )}
-        >
-          {todo.title}
-        </span>
+        />
         {todo.priority >= 2 && !done ? (
           <Flag
             className={cn(
@@ -96,9 +96,10 @@ export function TodoItem({
             style={{ backgroundColor: category.color ?? "var(--muted-foreground)" }}
             aria-hidden
           />
-          <span className="text-muted-foreground hidden text-xs sm:inline">
-            {category.name}
-          </span>
+          <TruncatedText
+            text={category.name}
+            className="text-muted-foreground hidden max-w-24 text-xs sm:block"
+          />
         </span>
       ) : null}
 
