@@ -8,6 +8,7 @@ import type { Reminder } from "@/db/schema";
 import { isDue } from "@/lib/reminders";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { TruncatedText } from "@/components/common/truncated-text";
 
 function formatRemindAt(ms: number): string {
   const d = new Date(ms);
@@ -49,14 +50,13 @@ export function ReminderItem({
         onClick={() => onEdit(reminder)}
         className="flex min-w-0 flex-1 flex-col items-start py-0.5 text-left"
       >
-        <span
+        <TruncatedText
+          text={reminder.title}
           className={cn(
-            "truncate text-sm",
+            "text-sm",
             done && "text-muted-foreground line-through",
           )}
-        >
-          {reminder.title}
-        </span>
+        />
         <span
           className={cn(
             "text-xs",

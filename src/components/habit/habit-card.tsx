@@ -10,6 +10,7 @@ import { useLogHabit } from "@/hooks/use-habits";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { TruncatedText } from "@/components/common/truncated-text";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,7 +60,7 @@ export function HabitCard({
           </span>
         </ProgressRing>
         <div className="min-w-0">
-          <p className="truncate font-medium">{habit.name}</p>
+          <TruncatedText as="p" text={habit.name} className="font-medium" />
           <p className="text-muted-foreground text-sm">
             {habit.todayCount}/{habit.targetCount}
             {habit.unit ? ` ${habit.unit}` : ""}
