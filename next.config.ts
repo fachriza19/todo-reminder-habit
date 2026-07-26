@@ -12,6 +12,19 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
+  experimental: {
+    // Every app route is dynamic (session cookie) and has a loading.tsx, so
+    // Next prefetches each nav link's shell. The default dynamic client-cache
+    // TTL is 0 — the prefetched RSC payload is discarded immediately and
+    // refetched on click. Giving it 30s lets the sidebar's in-viewport
+    // prefetches actually be reused, so navigation skips the round trip.
+    // 30s matches the TanStack Query staleTime; stale re-entries are corrected
+    // by React Query's own refetch and by router.refresh() on sign-out.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
 };
 
 export default nextConfig;
