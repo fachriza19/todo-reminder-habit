@@ -58,6 +58,7 @@ export function TodayHabits({
               <TruncatedText
                 as="p"
                 text={habit.name}
+                interactive={false}
                 className="text-sm font-medium"
               />
               <p className="text-muted-foreground text-xs">

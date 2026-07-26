@@ -64,7 +64,7 @@ export function CategoryFilter({
               style={{ backgroundColor: c.color ?? "var(--muted-foreground)" }}
               aria-hidden
             />
-            <TruncatedText text={c.name} className="max-w-32" />
+            <TruncatedText text={c.name} interactive={false} className="max-w-32" />
           </Chip>
         ))}
       </div>

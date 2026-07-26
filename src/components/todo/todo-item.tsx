@@ -73,6 +73,7 @@ export function TodoItem({
       >
         <TruncatedText
           text={todo.title}
+          interactive={false}
           className={cn(
             "text-sm",
             done && "text-muted-foreground line-through",

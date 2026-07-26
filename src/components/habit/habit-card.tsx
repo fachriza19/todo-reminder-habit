@@ -60,7 +60,12 @@ export function HabitCard({
           </span>
         </ProgressRing>
         <div className="min-w-0">
-          <TruncatedText as="p" text={habit.name} className="font-medium" />
+          <TruncatedText
+            as="p"
+            text={habit.name}
+            interactive={false}
+            className="font-medium"
+          />
           <p className="text-muted-foreground text-sm">
             {habit.todayCount}/{habit.targetCount}
             {habit.unit ? ` ${habit.unit}` : ""}

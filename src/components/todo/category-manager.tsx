@@ -105,6 +105,7 @@ function NewCategoryForm() {
           onChange={(e) => setName(e.target.value)}
           placeholder="New category name"
           aria-label="New category name"
+          maxLength={60}
         />
         <Button type="submit" size="icon" disabled={!name.trim()} aria-label="Add category">
           <Plus className="size-4" />
@@ -163,6 +164,7 @@ function CategoryRow({ category }: { category: Category }) {
           if (e.key === "Enter") e.currentTarget.blur();
         }}
         aria-label={`Rename ${category.name}`}
+        maxLength={60}
         className="h-8 border-transparent px-2 shadow-none hover:border-input focus-visible:border-input"
       />
       <Button

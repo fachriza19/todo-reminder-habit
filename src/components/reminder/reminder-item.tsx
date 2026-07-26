@@ -52,6 +52,7 @@ export function ReminderItem({
       >
         <TruncatedText
           text={reminder.title}
+          interactive={false}
           className={cn(
             "text-sm",
             done && "text-muted-foreground line-through",
