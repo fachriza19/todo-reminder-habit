@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { SlidersHorizontal } from "lucide-react";
 
 import { getSession } from "@/lib/get-session";
+import { getQueryClient } from "@/lib/query/server";
+import { listCategories } from "@/server/services/category.service";
+import { listArchivedHabits } from "@/server/services/habit.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@/components/auth/sign-out-button";
@@ -16,7 +20,20 @@ export default async function SettingsPage() {
   const session = await getSession();
   if (!session?.user) redirect("/login");
 
+  const queryClient = getQueryClient();
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: ["categories"],
+      queryFn: () => listCategories(session.user.id),
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ["habits", "archived"],
+      queryFn: () => listArchivedHabits(session.user.id),
+    }),
+  ]);
+
   return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
     <div className="grid gap-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
@@ -79,5 +96,6 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
     </div>
+    </HydrationBoundary>
   );
 }
