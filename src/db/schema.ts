@@ -1,4 +1,10 @@
-import { sqliteTable, text, integer, unique } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  unique,
+  index,
+} from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 
 /* ------------------------------------------------------------------ */
@@ -143,6 +149,110 @@ export const habitLogs = sqliteTable(
 );
 
 /* ------------------------------------------------------------------ */
+/* Expenses module (spec 2026-07-27). Money = integer minor units;     */
+/* occurred_on = local 'YYYY-MM-DD' like habit_logs.date.              */
+/* ------------------------------------------------------------------ */
+
+export const financeCategories = sqliteTable("finance_categories", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  kind: text("kind").notNull(), // 'expense' | 'income'
+  color: text("color"),
+  icon: text("icon"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isArchived: integer("is_archived").notNull().default(0),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const accounts = sqliteTable("accounts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'cash' | 'bank' | 'ewallet' | 'card'
+  color: text("color"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  isArchived: integer("is_archived").notNull().default(0),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const recurringRules = sqliteTable("recurring_rules", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  type: text("type").notNull(),
+  amountMinor: integer("amount_minor").notNull(),
+  categoryId: text("category_id").references(() => financeCategories.id, {
+    onDelete: "set null",
+  }),
+  accountId: text("account_id").references(() => accounts.id, {
+    onDelete: "set null",
+  }),
+  note: text("note"),
+  frequency: text("frequency").notNull(), // 'daily' | 'weekly' | 'monthly' | 'yearly'
+  dayOfMonth: integer("day_of_month"),
+  monthOfYear: integer("month_of_year"),
+  weekday: integer("weekday"),
+  startOn: text("start_on").notNull(),
+  endOn: text("end_on"),
+  nextRunOn: text("next_run_on").notNull(),
+  lastRunOn: text("last_run_on"),
+  isActive: integer("is_active").notNull().default(1),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const transactions = sqliteTable(
+  "transactions",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    type: text("type").notNull(), // 'expense' | 'income'
+    amountMinor: integer("amount_minor").notNull(), // always positive
+    categoryId: text("category_id").references(() => financeCategories.id, {
+      onDelete: "set null",
+    }),
+    accountId: text("account_id").references(() => accounts.id, {
+      onDelete: "set null",
+    }),
+    occurredOn: text("occurred_on").notNull(), // 'YYYY-MM-DD' local
+    note: text("note"),
+    recurringId: text("recurring_id").references(() => recurringRules.id, {
+      onDelete: "set null",
+    }),
+    createdAt: integer("created_at").notNull(),
+    updatedAt: integer("updated_at").notNull(),
+  },
+  (t) => [
+    index("tx_user_month_idx").on(t.userId, t.occurredOn),
+    // Guards lazy materialisation (P3) against duplicate inserts from
+    // concurrent requests. NULLs are distinct in SQLite unique indexes, so
+    // ordinary manual rows are unaffected.
+    unique("tx_recurring_date_uq").on(t.recurringId, t.occurredOn),
+  ],
+);
+
+export const budgets = sqliteTable("budgets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  categoryId: text("category_id").references(() => financeCategories.id, {
+    onDelete: "cascade",
+  }), // NULL = overall monthly budget
+  amountMinor: integer("amount_minor").notNull(),
+  startMonth: text("start_month").notNull(), // 'YYYY-MM', inclusive
+  endMonth: text("end_month"), // 'YYYY-MM', inclusive; NULL = still active
+  createdAt: integer("created_at").notNull(),
+});
+
+/* ------------------------------------------------------------------ */
 /* Relations                                                           */
 /* ------------------------------------------------------------------ */
 
@@ -168,8 +278,33 @@ export const habitLogsRelations = relations(habitLogs, ({ one }) => ({
   }),
 }));
 
+export const financeCategoriesRelations = relations(
+  financeCategories,
+  ({ many }) => ({ transactions: many(transactions) }),
+);
+
+export const accountsRelations = relations(accounts, ({ many }) => ({
+  transactions: many(transactions),
+}));
+
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  category: one(financeCategories, {
+    fields: [transactions.categoryId],
+    references: [financeCategories.id],
+  }),
+  account: one(accounts, {
+    fields: [transactions.accountId],
+    references: [accounts.id],
+  }),
+}));
+
 export type Category = typeof categories.$inferSelect;
 export type Todo = typeof todos.$inferSelect;
 export type Reminder = typeof reminders.$inferSelect;
 export type Habit = typeof habits.$inferSelect;
 export type HabitLog = typeof habitLogs.$inferSelect;
+export type FinanceCategory = typeof financeCategories.$inferSelect;
+export type Account = typeof accounts.$inferSelect;
+export type Transaction = typeof transactions.$inferSelect;
+export type Budget = typeof budgets.$inferSelect;
+export type RecurringRule = typeof recurringRules.$inferSelect;

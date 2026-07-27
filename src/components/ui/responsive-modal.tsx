@@ -28,19 +28,22 @@ export function ResponsiveModal({
   title,
   description,
   children,
+  desktopClassName,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
   description?: string;
   children: React.ReactNode;
+  /** Extra classes for the desktop dialog only — e.g. a wider `sm:max-w-md`. */
+  desktopClassName?: string;
 }) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
+        <DialogContent className={desktopClassName}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
             {description ? (
