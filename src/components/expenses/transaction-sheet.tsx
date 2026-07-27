@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useFinanceCategories } from "@/hooks/use-finance-categories";
 import { useIsMounted } from "@/hooks/use-is-mounted";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import {
   useCreateTransaction,
   useUpdateTransaction,
@@ -41,6 +42,7 @@ export function TransactionSheet({
       open={open}
       onOpenChange={onOpenChange}
       title={editing ? "Edit entry" : "Add entry"}
+      desktopClassName="sm:max-w-md"
     >
       {/* Mounting the form only while open — and keying it on the entry —
           resets every field on each open. Cheaper and less error-prone than
@@ -76,7 +78,12 @@ function TransactionForm({
   const mounted = useIsMounted();
   const storedMode = useExpenseSheet((s) => s.inputMode);
   const setInputMode = useExpenseSheet((s) => s.setInputMode);
-  const inputMode = mounted ? storedMode : "numpad";
+
+  // The numpad is a touch affordance. On a desktop pointer there is a real
+  // keyboard already, and a 4-column keypad crammed into a dialog is just
+  // clutter — so desktop is always keyboard mode and the toggle is hidden.
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const inputMode = isDesktop ? "keyboard" : mounted ? storedMode : "numpad";
 
   const [type, setType] = useState<TransactionType>(editing?.type ?? "expense");
   const [digits, setDigits] = useState(
@@ -166,14 +173,14 @@ function TransactionForm({
 
   return (
     <form
-      className="flex flex-col"
+      className="grid gap-3"
       onSubmit={(e) => {
         e.preventDefault();
         submit();
       }}
     >
       {/* expense/income switch + input mode toggle */}
-      <div className="flex items-center justify-between gap-2 px-4 pb-2">
+      <div className="flex items-center justify-between gap-2">
         <div className="bg-muted flex gap-1 rounded-full p-1">
           {(["expense", "income"] as const).map((t) => (
             <button
@@ -199,24 +206,26 @@ function TransactionForm({
           ))}
         </div>
 
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() =>
-            setInputMode(inputMode === "numpad" ? "keyboard" : "numpad")
-          }
-        >
-          {inputMode === "numpad" ? (
-            <>
-              <Keyboard className="size-4" aria-hidden /> Keyboard
-            </>
-          ) : (
-            <>
-              <Calculator className="size-4" aria-hidden /> Numpad
-            </>
-          )}
-        </Button>
+        {isDesktop ? null : (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() =>
+              setInputMode(inputMode === "numpad" ? "keyboard" : "numpad")
+            }
+          >
+            {inputMode === "numpad" ? (
+              <>
+                <Keyboard className="size-4" aria-hidden /> Keyboard
+              </>
+            ) : (
+              <>
+                <Calculator className="size-4" aria-hidden /> Numpad
+              </>
+            )}
+          </Button>
+        )}
       </div>
 
       <AmountField
@@ -233,7 +242,7 @@ function TransactionForm({
       />
 
       {/* account, date, note — all pre-filled or optional */}
-      <div className="flex flex-wrap items-center gap-2 px-4 pb-3">
+      <div className="flex flex-wrap items-center gap-2">
         {accounts.map((a) => (
           <button
             key={a.id}
@@ -274,7 +283,7 @@ function TransactionForm({
       </div>
 
       {showNote ? (
-        <div className="px-4 pb-3">
+        <div>
           <Input
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -290,7 +299,7 @@ function TransactionForm({
       {/* In keyboard mode Save moves above the system keyboard, which would
             otherwise cover it — the classic quick-add failure on mobile. */}
       {inputMode === "keyboard" ? (
-        <div className="px-4 pb-2">
+        <div>
           <Button
             type="submit"
             disabled={!canSave}
@@ -303,7 +312,7 @@ function TransactionForm({
           </Button>
         </div>
       ) : (
-        <div className="bg-muted/40 mt-1 border-t">
+        <div className="bg-muted/40 -mx-4 -mb-4 mt-1 border-t">
           <Numpad
             onKey={handleKey}
             onSave={submit}

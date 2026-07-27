@@ -86,7 +86,20 @@ export function ExpensesView({ initialMonth }: { initialMonth: string }) {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 p-4 pb-24">
+    // The app layout already supplies the container, max width and padding
+    // (app/(app)/layout.tsx) — matching the other views, this only lays out
+    // its own children.
+    <div className="grid gap-5">
+      <header className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight">Expenses</h1>
+        {/* Desktop gets a real button in the header; the floating action
+            button below is a touch pattern and stays on mobile. */}
+        <Button onClick={openAdd} className="hidden md:inline-flex">
+          <Plus className="size-4" aria-hidden />
+          Add entry
+        </Button>
+      </header>
+
       <MonthSwitcher month={month} onChange={setMonth} />
 
       {query.isPending ? (
@@ -118,7 +131,8 @@ export function ExpensesView({ initialMonth }: { initialMonth: string }) {
 
       <Button
         onClick={openAdd}
-        className="fixed right-5 bottom-20 z-20 h-13 rounded-full px-5 text-base shadow-lg md:right-8 md:bottom-8"
+        aria-label="Add entry"
+        className="fixed right-5 bottom-20 z-20 h-13 rounded-full px-5 text-base shadow-lg md:hidden"
       >
         <Plus className="size-5" aria-hidden />
         Add

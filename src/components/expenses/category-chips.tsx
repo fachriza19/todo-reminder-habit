@@ -28,10 +28,12 @@ export function CategoryChips({
   if (categories.length === 0) return null;
 
   return (
+    // Bleeds to the modal's edges so a scrolled chip row reads as continuing
+    // off-screen rather than stopping at an arbitrary margin.
     <div
       role="group"
       aria-label="Category"
-      className="flex gap-2 overflow-x-auto px-4 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {categories.map((c) => {
         const selected = c.id === value;

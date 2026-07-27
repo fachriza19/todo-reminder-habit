@@ -21,7 +21,10 @@ export function TransactionList({
     <div className="flex flex-col">
       {ledger.days.map((day) => (
         <section key={day.date}>
-          <header className="bg-background/85 text-muted-foreground sticky top-0 z-10 flex items-baseline justify-between gap-2 py-2 text-xs font-semibold backdrop-blur">
+          {/* Sticky only on desktop: on mobile the app header already owns
+              top-0 at a higher z-index, so a stuck day header just hides
+              behind it. */}
+          <header className="bg-background/85 text-muted-foreground z-10 flex items-baseline justify-between gap-2 py-2 text-xs font-semibold backdrop-blur md:sticky md:top-0">
             <span>{formatDayLabel(day.date, today)}</span>
             {/* Both figures on a day with income — a net would mislead. */}
             <span className="tabular-nums">

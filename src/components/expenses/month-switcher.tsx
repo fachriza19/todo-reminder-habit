@@ -5,6 +5,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { formatMonthLabel, shiftMonth } from "@/lib/expenses";
 import { Button } from "@/components/ui/button";
 
+/**
+ * Stretches full width on mobile so both arrows sit under a thumb; collapses
+ * to a compact left-aligned group on desktop, where a full-width control just
+ * strands the label in the middle of the page.
+ */
 export function MonthSwitcher({
   month,
   onChange,
@@ -13,7 +18,7 @@ export function MonthSwitcher({
   onChange: (month: string) => void;
 }) {
   return (
-    <div className="flex items-center justify-between gap-2">
+    <div className="flex items-center justify-between gap-2 md:justify-start">
       <Button
         variant="outline"
         size="icon"
@@ -23,9 +28,12 @@ export function MonthSwitcher({
         <ChevronLeft className="size-4" aria-hidden />
       </Button>
 
-      <h1 className="text-lg font-semibold tracking-tight">
+      <p
+        aria-live="polite"
+        className="min-w-40 text-center text-base font-semibold tracking-tight"
+      >
         {formatMonthLabel(month)}
-      </h1>
+      </p>
 
       <Button
         variant="outline"

@@ -27,7 +27,8 @@ export function AmountField({
   const value = digits === "" ? "" : formatMoneyCompact(Number(digits));
 
   return (
-    <div className="flex flex-col gap-1 px-5 pt-2 pb-3">
+    // No padding of its own — the modal (dialog or drawer) already pads.
+    <div className="flex flex-col gap-1">
       <label
         htmlFor="expense-amount"
         className="text-muted-foreground text-[11px] font-semibold tracking-wider uppercase"

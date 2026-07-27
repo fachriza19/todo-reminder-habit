@@ -24,7 +24,7 @@ export function TransactionItem({
     .join(" · ");
 
   return (
-    <div className="hover:bg-muted/60 flex min-w-0 items-center gap-2 border-t px-1 transition-colors">
+    <div className="group hover:bg-muted/60 flex min-w-0 items-center gap-2 border-t px-1 transition-colors">
       <button
         type="button"
         onClick={() => onEdit(row)}
@@ -72,7 +72,7 @@ export function TransactionItem({
         size="icon"
         aria-label={`Delete ${title}`}
         onClick={() => onDelete(row)}
-        className="text-muted-foreground hover:text-destructive size-10 shrink-0"
+        className="row-actions text-muted-foreground hover:text-destructive size-10 shrink-0"
       >
         <Trash2 className="size-4" aria-hidden />
       </Button>
