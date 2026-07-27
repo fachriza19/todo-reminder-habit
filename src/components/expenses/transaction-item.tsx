@@ -72,7 +72,7 @@ export function TransactionItem({
         size="icon"
         aria-label={`Delete ${title}`}
         onClick={() => onDelete(row)}
-        className="text-muted-foreground hover:text-destructive shrink-0"
+        className="text-muted-foreground hover:text-destructive size-10 shrink-0"
       >
         <Trash2 className="size-4" aria-hidden />
       </Button>

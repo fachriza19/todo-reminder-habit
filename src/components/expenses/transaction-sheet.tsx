@@ -185,7 +185,7 @@ function TransactionForm({
                 setCategoryId(null);
               }}
               className={cn(
-                "min-h-9 rounded-full px-4 text-sm font-semibold capitalize transition-colors",
+                "min-h-11 rounded-full px-4 text-sm font-semibold capitalize transition-colors",
                 type === t
                   ? cn(
                       "bg-card shadow-sm",
