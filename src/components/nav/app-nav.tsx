@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, CheckSquare, Bell, Flame, Settings, LogOut } from "lucide-react";
+import {
+  CalendarDays,
+  CheckSquare,
+  Bell,
+  Flame,
+  Wallet,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
@@ -27,6 +35,7 @@ const NAV_ITEMS = [
   { href: "/todos", label: "Todos", icon: CheckSquare },
   { href: "/reminders", label: "Reminders", icon: Bell },
   { href: "/habits", label: "Habits", icon: Flame },
+  { href: "/expenses", label: "Expenses", icon: Wallet },
 ] as const;
 
 function isActive(pathname: string, href: string) {
@@ -103,7 +112,7 @@ export function MobileTabBar() {
   const items = [...NAV_ITEMS, { href: "/settings", label: "Settings", icon: Settings }] as const;
 
   return (
-    <nav className="bg-background/95 supports-backdrop-filter:bg-background/80 fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden">
+    <nav className="bg-background/95 supports-backdrop-filter:bg-background/80 fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t pb-[env(safe-area-inset-bottom)] backdrop-blur-sm md:hidden">
       {items.map((item) => {
         const active = isActive(pathname, item.href);
         return (
